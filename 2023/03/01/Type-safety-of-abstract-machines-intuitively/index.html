@@ -8,9 +8,10 @@
 <p>Similarly, points <code>s₀</code> <code>s₁</code> … <code>sₙ</code> are machine states from a concrete computation; arrows <code>ra</code> <code>rb</code> … are state transition rules. Now think about the question: what are these vertical arrows mean?</p>
 <p>They are of type <code>State → Type</code>, so basically they represent typing of machine states. The proof of machine state typing can be hard and tedious, but luckily it’s off-topic. Now you have the big picture and the informal correspondence, let’s focus on what preservation and progress mean.</p>
 <ul>
-<li><strong>preservation</strong>: grab any two points <code>sₓ</code> and <code>sₓ₊₁</code>, and the arrow between them, say <code>rx</code>. If <code>sₓ ⊢ τ</code>, and <code>rx : sₓ → sₓ₊₁</code>, we should have <code>sₓ₊₁ ⊢ τ</code> as well, i.e. <code>rx</code> preserves the type.</li>
-<li><strong>progress</strong>: grab any point <code>sₓ</code>, and its typing <code>sₓ ⊢ τ</code>, then we know <code>sₓ</code> is either the finial state, or there is another state <code>sₓ₊₁</code> where it can go along the transition <code>rx</code>.</li>
+<li><strong>preservation</strong>: grab any two adjacent states <code>sₓ</code> and <code>sₓ₊₁</code>, and the arrow between them, say <code>rx</code>. If <code>sₓ ⊢ τ</code>, and <code>rx : sₓ ↦ sₓ₊₁</code>, we should have <code>sₓ₊₁ ⊢ τ</code> as well, i.e. <code>rx</code> preserves the type.</li>
+<li><strong>progress</strong>: grab any state <code>sₓ</code>, and its typing <code>sₓ ⊢ τ</code>, then we know <code>sₓ</code> is either the finial state, or there is another state <code>sₓ₊₁</code> where it can go along the transition <code>rx : sₓ ↦ sₓ₊₁</code>.</li>
 </ul>
+<p>By connecting preservation and progress, we can prove that all transition rules preserve typing.</p>
 <p>One significant difference here from the compiler example is, each transition rule can be used more than once during the computation while each compiler pass is unique along the whole compilation. These transition rules can also be called “type preserving transformations”.</p>
 <h3 id="Questions"><a href="#Questions" class="headerlink" title="Questions"></a>Questions</h3><ol>
 <li>Can you see the relation between the arrow <code>evalₓ</code> in the first picture and the whole computation <code>s₀ ↦* sₙ</code> in the second picture?</li>
