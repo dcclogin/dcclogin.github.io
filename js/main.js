@@ -4,8 +4,8 @@ $(() => {
   $('[data-toggle="tooltip"]').tooltip();
 
   // 代码高亮
-  document.querySelectorAll("pre code").forEach((block) => {
-    hljs.highlightBlock(block);
-  });
+  //document.querySelectorAll("pre code").forEach((block) => {
+  //  hljs.highlightBlock(block);
+  //});
 
 });
