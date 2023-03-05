@@ -40,7 +40,7 @@ H2 {
   font-family: "Palatino Linotype", "Book Antiqua", Palatino, Helvetica, STKaiti,
     SimSun, serif;
   margin-bottom: 40px;
-  padding: 5px;
+  padding: 0px;
   border-bottom: 2px LightGrey solid;
   width: 98%;
   line-height: 150%;
@@ -88,7 +88,7 @@ li {
 blockquote {
   border-left: 5px lightgrey solid;
   padding-left: 15px;
-  margin-left: 20px;
+  margin-left: 0px;
   background: #f4f4f4;
 }
 
