@@ -37,7 +37,7 @@ p₄ = (c₂ ⊕ id) ⊙ swap₊ ⊙ (c₁ ⊕ id)
 <pre><code class="text">idl = c ⇔ id ⊙ c
 idr = c ⇔ c ⊙ id
 </code></pre>
-<p>We need <code>re-organize</code> and <code>associativity</code> to perform “re-focusing” during proofs:</p>
+<p>We need <code>re-organize</code> and <code>associativity</code> to perform “re-focusing” within proofs:</p>
 <pre><code class="text">re-organize = (c₁ ⊙ c₂) ⊕ (c₃ ⊙ c₄) ⇔ (c₁ ⊕ c₃) ⊙ (c₂ ⊕ c₄)
 associativity = (c₁ ⊙ c₂) ⊙ c₃ ⇔ c₁ ⊙ (c₂ ⊙ c₃)
 </code></pre>
