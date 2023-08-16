@@ -1,0 +1,71 @@
+<!DOCTYPE html><html lang="en"><head><title>Transfinity, stream, and recursion</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="stylesheet" href="/css/highlight/xcode.min.css"><link rel="stylesheet" href="/css/bootstrap/bootstrap-tooltips.css"><link rel="stylesheet" href="/css/post.css"><script src="/js/jquery.min.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><script>if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
+  document.body.classList.add('mobile')
+}</script><div><div class="inner"><h2>Transfinity, stream, and recursion</h2><p>As you might see, this cannot be a worse title. But recently I was inspired by Zizek’s interpretation on Kant’s transcendental objects and Lacan’s <em>objet petit a</em>, in his book <em>Less Than Nothing</em>, to make these many things connected in a gradual sense.</p>
+<p>To begin with, you will assume a counting starting from zero. With ‘set representation’, I write down:</p>
+<pre><code>&#123;0, 1, 2, ...&#125;
+</code></pre>
+<p>You might think it’s the set of natural number, the aleph-naught, or something. It’s not yet informative to that extent. Symbolically, one can argue that <code>...</code> is fuzzy enough. It nontheless represents a “constant possibility of <code>+1</code>“, as if the magical infinity “spits out” one but itself still remain intact.</p>
+<pre><code>&#123;...&#125;
+&#123;0, ...&#125;
+&#123;0, 1, ...&#125;
+&#123;0, 1, 2, ...&#125;
+</code></pre>
+<p>One cannot help but bet there is a “point of impossibility”, an inaccessable <code>X</code>, lying at the ‘end’ of the series:</p>
+<pre><code>&#123;0, 1, 2, ..., X&#125;
+</code></pre>
+<p>Now we have two opposite concepts:</p>
+<ul>
+<li>the constant possibility of adding one</li>
+<li>the impossibility to access the ultimate element <code>X</code></li>
+</ul>
+<p>What if there is a short-circuit between them? That is, what if the inaccessable <code>X</code> is itself the constant possibility of adding one, represented as <code>&#123;...&#125;</code> (or other representations with <code>...</code> inside like <code>&#123;0, 1, 2, ...&#125;</code>)?</p>
+<p>With one more step forward, one can write this down carefully:</p>
+<pre><code>&#123;0, 1, 2, ..., &#123;0, 1, 2, ...&#125;&#125;
+</code></pre>
+<p>It’s the counting from zero to one. Because one can continue adding symbol <code>X</code> in the nested set, and unfolding it further.</p>
+<pre><code>&#123;0, 1, 2, ..., &#123;0, 1, 2, ..., X&#125;&#125;
+&#123;0, 1, 2, ..., &#123;0, 1, 2, ..., &#123;0, 1, 2, ...&#125;&#125;&#125;
+</code></pre>
+<p>The constant possibility of adding one is inscribed into the level where the unfolding goes on. To make it more concise, if one takes <code>&#123;0, 1, 2, ..., X&#125;</code> as the representation of constant possibility of adding one, and <code>=</code> as the short-circuit operation:</p>
+<pre><code>X = &#123;0, 1, 2, ..., X&#125;
+</code></pre>
+<p>It is the transfinity.</p>
+<h3 id="Stream"><a href="#Stream" class="headerlink" title="Stream"></a>Stream</h3><p>A simple variant of the above result would be like:</p>
+<pre><code>X = (1, X)
+</code></pre>
+<p>It’s a stream of <code>1</code>s. In Racket, with <code>delay</code> or <code>lambda</code>, one can define such a stream:</p>
+<pre><code class="scheme">(define 1s (cons 1 (delay 1s)))
+(define 1s (cons 1 (lambda () 1s)))
+</code></pre>
+<p>Stream is no more than transfinity. It’s a constant possibility of unfolding, a stream of empirical objects, by definition, but one may not easily relate an arbitrary stream to the impossibility of reaching a ultimate elment (transcendental object) in itself. One can regard the stream itself as an ‘external framework’, or a more computational word, ‘generator’ of all empirical objects.</p>
+<h3 id="Fixpoint-and-recursion"><a href="#Fixpoint-and-recursion" class="headerlink" title="Fixpoint and recursion"></a>Fixpoint and recursion</h3><p>Another (more general) variant of the above result is something called ‘fixed point’ or ‘fixpoint’:</p>
+<pre><code>X = F(X)
+</code></pre>
+<p>where <code>F</code> is some mathematical or computational function. Here the transfinity lies in, at the most obvious level, the constant possibility of applying the function <code>F</code>:</p>
+<pre><code>X = F(X)
+X = F(F(X))
+X = F(F(F(X)))
+</code></pre>
+<p>One can say it’s too general and has nothing informative. There is nontheless one tiny tweak to be done to make it powerful - what if <code>X</code> is also indexed by another variable, that is, <code>X</code> is some <code>g(x)</code>?</p>
+<pre><code>g(x) = F(g(x))
+</code></pre>
+<p>This is recursion without ‘termination conditions’, with <code>F</code> as the ‘wrapper’ of recursive call to <code>g</code>. To make it practical, one need to specify the very data type of <code>x</code> and create at least one termination condition, for example:</p>
+<pre><code>g(0) = 0
+g(x+1) = F(g(x))
+</code></pre>
+<p>Racket version:</p>
+<pre><code>(define (g x)
+  (cond
+    [(zero? x) 0]
+    [else (F (g (sub1 x)))]))
+</code></pre>
+<p>A recursion is a ‘quasi-transifinity’ with an emprical ‘ultimate object’. It always returns half-way to the transfinite.</p>
+<p>Question:</p>
+<ul>
+<li>How is this story related to Y combinator (fixpoint combinator)?</li>
+<li>How to explain the computational power of recursive functions?</li>
+</ul>
+<h3 id="Toward-a-more-fundamental-set-of-symbolic-operation-beyond-Cantor"><a href="#Toward-a-more-fundamental-set-of-symbolic-operation-beyond-Cantor" class="headerlink" title="Toward a more fundamental set of symbolic operation: beyond Cantor?"></a>Toward a more fundamental set of symbolic operation: beyond Cantor?</h3></div></div></body><script src="/js/highlight.min.js"></script><script src="/js/main.js"></script><script src="/js/bootstrap/bootstrap.min.js"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '');</script></html>
