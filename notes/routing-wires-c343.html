@@ -54,9 +54,9 @@ The updated board is the same:
 <li>We <code>prune</code> the solution space when a goal fails</li>
 </ul>
 <h3 id="Example-2-pruning"><a href="#Example-2-pruning" class="headerlink" title="Example 2 (pruning)"></a>Example 2 (pruning)</h3><p>Slogan:</p>
-<ul>
-<li><em>You can only fail once</em> for a certain prefix of permutation!</li>
-</ul>
+<blockquote>
+<p><em>You can only fail once</em> for a certain prefix of permutation!</p>
+</blockquote>
 <p>Suppose we have a list of <code>goals</code> [1,2,3,4,5,6] with a certain board configuration. Following BFS, any permutations where the success of goal <code>2</code> always blocks the success of goal <code>1</code>:</p>
 <pre><code class="text">[2, 1, _, _, _, _]    =&gt; 5! permutations are pruned (starting with 2 is not feasible at all)
     X
@@ -82,7 +82,7 @@ The updated board is the same:
 <li><code>continue</code> will prune a smaller subproblem later (less aggressive).</li>
 <li>no feasible solutions are pruned if we simply return <code>null</code>. (why?)</li>
 </ul>
-<p>If a path cannot be found in a board configuration <code>A</code>, then there is no chance we can find one with <code>A + an extra wire</code>!</p>
+<p>Observation:<br>If a path cannot be found in a board configuration <code>A</code>, then there is no chance we can find one with <code>A + an extra wire</code>!</p>
 <h2 id="Instructor’s-Solution-BFS-Backtracking"><a href="#Instructor’s-Solution-BFS-Backtracking" class="headerlink" title="Instructor’s Solution (BFS + Backtracking)"></a>Instructor’s Solution (BFS + Backtracking)</h2><p>Here’s a detailed demonstration of instructor’s solution, which uses BFS and backtracking without heuristics.</p>
 <h3 id="BFS"><a href="#BFS" class="headerlink" title="BFS"></a>BFS</h3><p>BFS is for finding a relatively short path between a pair of endpoints on the board. In other words, it determines whether a goal should <em>fail</em> or <em>succeed</em>, and in what way (path) it succeeds! </p>
 <p>Therefore, intuitively, the <code>bfs</code> function returns a <code>boolean</code> value:</p>
@@ -255,7 +255,18 @@ md:    1  2  3  3  4  7
     return new ArrayList&lt;&gt;();  // If all permutations fail, return an empty list
 &#125;
 </code></pre>
-<h3 id="Unusual-Solution-Try-Catch-Exception-Handler"><a href="#Unusual-Solution-Try-Catch-Exception-Handler" class="headerlink" title="Unusual Solution: Try-Catch (Exception Handler)"></a>Unusual Solution: Try-Catch (Exception Handler)</h3><p>Here is a more “dynamic” and “on-the-fly” way to solve the conflict between wires.</p>
+<h3 id="Unusual-Solution-Try-Catch-Exception-Handler"><a href="#Unusual-Solution-Try-Catch-Exception-Handler" class="headerlink" title="Unusual Solution: Try-Catch (Exception Handler)"></a>Unusual Solution: Try-Catch (Exception Handler)</h3><p>Here is a more “dynamic” and “on-the-fly” way to do backtracking and resolve conflicts:</p>
+<ul>
+<li>build path (“proposed path”) for each goal <em>independently</em>.</li>
+<li><code>try</code> to place them one by one.</li>
+<li><code>catch</code> the wire-wire conflict exception </li>
+<li>re-build a new path&#x2F;wire for the latter goal:<ul>
+<li>if succeed -&gt; move on to the next goal.</li>
+<li>if cannot re-build a new path -&gt; remove one previously placed wire on the board and retry.</li>
+</ul>
+</li>
+<li>until all conflicts solved.</li>
+</ul>
 <pre><code class="java">public static ArrayList&lt;Wire&gt; findPaths(Board board, ArrayList&lt;Endpoints&gt; goals) &#123;
     ArrayList&lt;Wire&gt; finalWires = new ArrayList&lt;&gt;();
     HashMap&lt;Integer, Wire&gt; proposedPaths = new HashMap&lt;&gt;();
