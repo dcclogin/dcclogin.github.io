@@ -1,4 +1,8 @@
-<!DOCTYPE html><html lang="en"><head><title>C343 Code Reviw - Routing Wires</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="stylesheet" href="/css/highlight/xcode.min.css"><link rel="stylesheet" href="/css/bootstrap/bootstrap-tooltips.css"><link rel="stylesheet" href="/css/post.css"><script src="/js/jquery.min.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><script>if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
+<!DOCTYPE html><html lang="en"><head><title>C343 Code Reviw - Routing Wires</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="stylesheet" href="/css/highlight/xcode.min.css"><link rel="stylesheet" href="/css/bootstrap/bootstrap-tooltips.css"><link rel="stylesheet" href="/css/post.css"><script src="/js/jquery.min.js"></script><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><script>if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
   document.body.classList.add('mobile')
 }</script><div><div class="inner"><h2>C343 Code Reviw - Routing Wires</h2><p>This is for the code review session for the 3rd project (Routing Wires) for Data Structure (C343) Spring 2024.</p>
 <h2 id="The-Idea"><a href="#The-Idea" class="headerlink" title="The Idea"></a>The Idea</h2><p>The type signature of the <code>findPaths</code> function:</p>
@@ -15,7 +19,7 @@
 <li>The chip board is <strong>updated</strong> (wires all connected &#x2F; goals all succeed).</li>
 <li>An <strong>ordered</strong> list of wires is returned.</li>
 </ol>
-<p>Therefore, a solution can be represented as a combination of a <strong>permutation</strong> of goals qua input.</p>
+<p>Therefore, a solution can be represented as a <strong>permutation</strong> of goals.</p>
 <h3 id="Example-1"><a href="#Example-1" class="headerlink" title="Example 1"></a>Example 1</h3><p>Think about the following inital board configuration:</p>
 <pre><code class="text">0  0 2  0 3  0 0
 0 -1 0 -1 0 -1 0
@@ -216,7 +220,7 @@ md:    1  2  3  3  4  7
 </code></pre>
 <h3 id="Try-All-Permutations-no-pruning"><a href="#Try-All-Permutations-no-pruning" class="headerlink" title="Try All Permutations (no pruning)"></a>Try All Permutations (no pruning)</h3><p>Recall:</p>
 <ul>
-<li>a solution can be represented as a combination of a <strong>permutation</strong> of goals as input.</li>
+<li>a solution can be represented as a <strong>permutation</strong> of goals as input.</li>
 </ul>
 <p>Therefore it’s possible to loop over all permutations until a feasible solution is found. Generally, there is no pruning in this solution, which means there might be some unnecessary fails. But it depends on the implementation of <code>nextPermutaion</code> and can be combined with heuristics.</p>
 <pre><code class="java">public static ArrayList&lt;Wire&gt; findPaths(Board board, ArrayList&lt;Endpoints&gt; goals) &#123;
