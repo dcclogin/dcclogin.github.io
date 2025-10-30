@@ -1,0 +1,347 @@
+<!DOCTYPE html><html lang="en"><head><title>C343 Code Reviw - Routing Wires</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><link rel="stylesheet" href="/css/highlight/xcode.min.css"><link rel="stylesheet" href="/css/bootstrap/bootstrap-tooltips.css"><link rel="stylesheet" href="/css/post.css"><script src="/js/jquery.min.js"></script><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><script>if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
+  document.body.classList.add('mobile')
+}</script><div><div class="inner"><h2>C343 Code Reviw - Routing Wires</h2><p>This is for the code review session for the 3rd project (Routing Wires) for Data Structure (C343) Spring 2024.</p>
+<h2 id="The-Idea"><a href="#The-Idea" class="headerlink" title="The Idea"></a>The Idea</h2><p>The type signature of the <code>findPaths</code> function:</p>
+<pre><code class="highlight java"><span class="keyword">public</span> <span class="keyword">static</span> ArrayList&lt;Wire&gt; <span class="title function_">findPaths</span><span class="params">(Board board, ArrayList&lt;Endpoints&gt; goals)</span></code></pre>
+<p>Question: What is a <strong>goal</strong>? What is a <strong>Wire</strong>?</p>
+<ul>
+<li>A goal is a pair of endpoints on the board waiting to be connected.</li>
+<li>A goal can either <em>fail</em> or <em>succeed</em>.</li>
+<li>A wire is a goal that succeeds (find a path between 2 endpoints with BFS etc).</li>
+</ul>
+<p>Question: What constitutes a <strong>solution</strong>?</p>
+<ol>
+<li>The chip board is <strong>updated</strong> (wires all connected &#x2F; goals all succeed).</li>
+<li>An <strong>ordered</strong> list of wires is returned.</li>
+</ol>
+<p>Therefore, a solution can be represented as a <strong>permutation</strong> of goals.</p>
+<h3 id="Example-1"><a href="#Example-1" class="headerlink" title="Example 1"></a>Example 1</h3><p>Think about the following inital board configuration:</p>
+<pre><code class="highlight text">0  0 2  0 3  0 0
+0 -1 0 -1 0 -1 0
+0  1 0  0 0  1 0
+0 -1 0 -1 0 -1 0
+0  0 2  0 3  0 0</code></pre>
+
+<p>Question: How many permutations of goals [1,2,3]?</p>
+<pre><code class="highlight text">A(n) = n!
+A(3) = 3! = 3*2 = 6
+
+They are
+[1,2,3] [1,3,2] [2,3,1] [2,1,3] [3,1,2] [3,2,1]</code></pre>
+
+<p>Question: How many <em>feasible solutions</em> (suppose we use BFS)?</p>
+<pre><code class="highlight text">There are only 2:
+
+[1,2,3] [1,3,2]
+
+The updated board is the same:
+
+2  2 2  0 3  3 3
+2 -1 0 -1 0 -1 3
+2  1 1  1 1  1 3
+2 -1 0 -1 0 -1 3
+2  2 2  0 3  3 3</code></pre>
+
+<p>Remarks:</p>
+<ul>
+<li>We <code>accept</code> only <strong>one arbitrary</strong> feasible solution (either <code>[1,2,3]</code> or <code>[1,3,2]</code>, not both).</li>
+<li>The initial order of <code>goals</code> matters a lot:<ul>
+<li>no need for backtracking if properly arranged a priori (<code>[1,2,3]</code> or <code>[1,3,2]</code>). </li>
+<li>a space for creative <strong>heuristics</strong>.</li>
+</ul>
+</li>
+<li>We <code>prune</code> the solution space when a goal fails</li>
+</ul>
+<h3 id="Example-2-pruning"><a href="#Example-2-pruning" class="headerlink" title="Example 2 (pruning)"></a>Example 2 (pruning)</h3><p>Slogan:</p>
+<blockquote>
+<p><em>You can only fail once</em> for a certain prefix of permutation!</p>
+</blockquote>
+<p>Suppose we have a list of <code>goals</code> [1,2,3,4,5,6] with a certain board configuration. Following BFS, any permutations where the success of goal <code>2</code> always blocks the success of goal <code>1</code>:</p>
+<pre><code class="highlight text">[2, 1, _, _, _, _]    =&gt; 5! permutations are pruned (starting with 2 is not feasible at all)
+    X
+
+[2, 3, 1, _, _, _]    =&gt; 4! permutations are pruned
+       X
+
+[2, 3, 4, 1, _, _]    =&gt; 3! permutations are pruned
+          X</code></pre>
+
+<pre><code class="highlight java"><span class="keyword">for</span> (Endpoints curr : goals) &#123;
+    <span class="keyword">if</span> (bfsFindOnePath(board, curr) == <span class="literal">null</span>) &#123;
+        <span class="comment">// continue;   =&gt; less aggressive pruning</span>
+        <span class="keyword">return</span> <span class="literal">null</span>;   =&gt; more aggressive pruning
+    &#125; <span class="keyword">else</span> &#123;
+        ...
+    &#125;
+&#125;</code></pre>
+
+<p>Remarks:</p>
+<ul>
+<li>returning <code>null</code> will fully prune the current subproblem right now.</li>
+<li><code>continue</code> will prune a smaller subproblem later (less aggressive).</li>
+<li>no feasible solutions are pruned if we simply return <code>null</code>. (why?)</li>
+</ul>
+<p>Observation:<br>If a path cannot be found in a board configuration <code>A</code>, then there is no chance we can find one with <code>A + an extra wire</code>!</p>
+<h2 id="Instructor’s-Solution-BFS-Backtracking"><a href="#Instructor’s-Solution-BFS-Backtracking" class="headerlink" title="Instructor’s Solution (BFS + Backtracking)"></a>Instructor’s Solution (BFS + Backtracking)</h2><p>Here’s a detailed demonstration of instructor’s solution, which uses BFS and backtracking without heuristics.</p>
+<h3 id="BFS"><a href="#BFS" class="headerlink" title="BFS"></a>BFS</h3><p>BFS is for finding a relatively short path between a pair of endpoints on the board. In other words, it determines whether a goal should <em>fail</em> or <em>succeed</em>, and in what way (path) it succeeds! </p>
+<p>Therefore, intuitively, the <code>bfs</code> function returns a <code>boolean</code> value:</p>
+<pre><code class="highlight java"><span class="keyword">private</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">bfs</span><span class="params">(Board board, Endpoints eps, Map&lt;Coord, Coord&gt; parents)</span></code></pre>
+
+<p>Remarks:</p>
+<ul>
+<li><code>board</code> is not yet updated in <code>bfs</code> (wire is not placed onto the board).</li>
+<li>a path from <code>start</code> to <code>end</code> is recorded through updating <code>parents</code> map, if <code>true</code> is returned.</li>
+<li>a partial path from <code>start</code> to some dead end is also recorded (useless), if <code>false</code> is returned.</li>
+</ul>
+<pre><code class="highlight java"><span class="keyword">private</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">bfs</span><span class="params">(Board board, Endpoints eps, Map&lt;Coord, Coord&gt; parents)</span> &#123;
+    Queue&lt;Coord&gt; queue = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();
+    Set&lt;Coord&gt; visited = <span class="keyword">new</span> <span class="title class_">HashSet</span>&lt;&gt;();
+    queue.add(eps.start);
+    <span class="keyword">while</span> (!queue.isEmpty()) &#123;
+        <span class="type">Coord</span> <span class="variable">cur</span> <span class="operator">=</span> queue.remove();
+        visited.add(cur);
+        <span class="keyword">if</span> (cur.equals(eps.end))
+            <span class="keyword">return</span> <span class="literal">true</span>;
+        <span class="keyword">for</span> (Coord adj : board.adj(cur)) &#123;
+            <span class="keyword">if</span> ((board.getValue(adj) == <span class="number">0</span> || adj.equals(eps.end))
+                    &amp;&amp; !visited.contains(adj)) &#123;
+                queue.add(adj);
+                parents.put(adj, cur);
+            &#125;
+        &#125;
+    &#125;
+    <span class="keyword">return</span> <span class="literal">false</span>;
+&#125;</code></pre>
+
+<p>Question: Any other candidates of searching algorithms? Why not DFS?</p>
+<p>The next step is to update the <code>board</code> (i.e. <code>placeWire</code> onto the board):</p>
+<ul>
+<li>if <code>bfs</code> returns <code>true</code>, then (re-)construct a <code>wire</code> with <code>parents</code> map and place it onto the board.</li>
+<li>if <code>bfs</code> returns <code>false</code>, nothing happens (no update).</li>
+</ul>
+<pre><code class="highlight java"><span class="keyword">private</span> <span class="keyword">static</span> Wire <span class="title function_">bfsFindOnePath</span><span class="params">(Board board, Endpoints eps)</span> &#123;
+    Map&lt;Coord, Coord&gt; parents = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();
+    <span class="type">boolean</span> <span class="variable">found_dest</span> <span class="operator">=</span> bfs(board, eps, parents);
+    <span class="keyword">if</span> (found_dest) &#123;
+        ArrayList&lt;Coord&gt; path = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Coord&gt;();
+        path.add(eps.end);
+        <span class="type">Coord</span> <span class="variable">p</span> <span class="operator">=</span> parents.get(eps.end);
+        <span class="keyword">while</span> (p != <span class="literal">null</span>) &#123;
+            path.add(p);
+            p = parents.get(p);
+        &#125;
+        java.util.Collections.reverse(path);
+        <span class="type">Wire</span> <span class="variable">w</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Wire</span>(eps.id, path);
+        board.placeWire(w);
+        <span class="keyword">return</span> w;
+    &#125; <span class="keyword">else</span> &#123;
+        <span class="keyword">return</span> <span class="literal">null</span>;
+    &#125;
+&#125;</code></pre>
+
+
+<h3 id="Naive-BFS-no-backtracking-no-heuristics"><a href="#Naive-BFS-no-backtracking-no-heuristics" class="headerlink" title="Naive BFS (no backtracking, no heuristics)"></a>Naive BFS (no backtracking, no heuristics)</h3><p>This should pass 8-9 out of 11 autograder tests.</p>
+<pre><code class="highlight java"><span class="keyword">private</span> <span class="keyword">static</span> ArrayList&lt;Wire&gt; <span class="title function_">bfsFindPaths</span><span class="params">(Board board, ArrayList&lt;Endpoints&gt; goals)</span> &#123;
+    ArrayList&lt;Wire&gt; wires = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();
+    <span class="keyword">for</span> (Endpoints endpoints : goals) &#123;
+        wires.add(bfsFindOnePath(board, endpoints));
+    &#125;
+    <span class="keyword">return</span> wires;
+&#125;</code></pre>
+
+
+<h3 id="Backtracking-no-heuristics"><a href="#Backtracking-no-heuristics" class="headerlink" title="Backtracking (no heuristics)"></a>Backtracking (no heuristics)</h3><p>Basically, backtracking is baked into the recursion structure:</p>
+<ul>
+<li>we keep spliting the list of <code>goals</code> into a <code>curr</code> element and the <code>rest</code> elements.</li>
+<li>first try BFS with the <code>curr</code> element:<ul>
+<li>if succeed, a <code>wire</code> is placed -&gt; try the recursive part (<code>rest</code>).</li>
+<li>if fail, <code>continue</code>&#x2F;<code>return null</code> (pruning the solution space)</li>
+</ul>
+</li>
+<li>second try the <code>rest</code>, recursive part:<ul>
+<li>if succeed, it means a feasible solution is found -&gt; return a list of <code>wire</code></li>
+<li>if fail, remove the current <code>wire</code> on the board -&gt; try another <code>curr</code>-<code>rest</code></li>
+</ul>
+</li>
+</ul>
+<pre><code class="highlight java"><span class="keyword">private</span> <span class="keyword">static</span> ArrayList&lt;Wire&gt; <span class="title function_">backtrackingFindPaths</span><span class="params">(Board board, ArrayList&lt;Endpoints&gt; goals)</span> &#123;
+    <span class="keyword">if</span> (goals.size() == <span class="number">0</span>) &#123;
+        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();
+    &#125; <span class="keyword">else</span> &#123;
+        <span class="comment">// Try to find a point for one of the end-points.</span>
+        <span class="keyword">for</span> (Endpoints curr : goals) &#123;
+            <span class="type">Wire</span> <span class="variable">w</span> <span class="operator">=</span> bfsFindOnePath(board, curr);
+            <span class="keyword">if</span> (w == <span class="literal">null</span>) &#123; <span class="comment">// failed</span>
+                <span class="comment">// continue;</span>
+                <span class="keyword">return</span> <span class="literal">null</span>;
+            &#125; <span class="keyword">else</span> &#123; <span class="comment">// success</span>
+                <span class="comment">// Recursively solve the rest</span>
+                ArrayList&lt;Endpoints&gt; rest = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(goals);
+                rest.remove(curr);
+                ArrayList&lt;Wire&gt; result = backtrackingFindPaths(board, rest);
+                <span class="keyword">if</span> (result == <span class="literal">null</span>) &#123;
+                    <span class="comment">// Undo the current wire.</span>
+                    board.removeWire(w);
+                    <span class="keyword">continue</span>;
+                &#125; <span class="keyword">else</span> &#123; <span class="comment">// The rest succeeded, add this one and return</span>
+                    result.add(w);
+                    <span class="keyword">return</span> result;
+                &#125;
+            &#125;
+        &#125;
+        <span class="comment">// We never succeeded, so return null</span>
+        <span class="keyword">return</span> <span class="literal">null</span>;
+    &#125;
+&#125;</code></pre>
+
+<h2 id="Students’-solutions"><a href="#Students’-solutions" class="headerlink" title="Students’ solutions"></a>Students’ solutions</h2><p>Here are some interesting solutions from students.</p>
+<h3 id="Heuristic-Increasing-Order-of-Manhattan-Distances"><a href="#Heuristic-Increasing-Order-of-Manhattan-Distances" class="headerlink" title="Heuristic: Increasing Order of Manhattan Distances"></a>Heuristic: Increasing Order of Manhattan Distances</h3><p>Recall:</p>
+<ul>
+<li>The initial order of <code>goals</code> matters.</li>
+</ul>
+<p>We can reduce the chance for backtracking with a quasi-empirical fact:</p>
+<ul>
+<li>wires with less “lengths” are less likely to block the others,</li>
+<li>therefore we find paths for and place them first.</li>
+</ul>
+<p>One quantification of “length” is <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Taxicab_geometry">Manhattan Distance</a>.</p>
+<pre><code class="highlight text">md:    4  3  2  1  3  7
+       |  |  |  |  |  |
+#goal [1, 2, 3, 4, 5, 6]
+
+=&gt; (sorting w.r.t. md)
+
+md:    1  2  3  3  4  7
+       |  |  |  |  |  |
+#goal [4, 3, 2, 5, 1, 6]</code></pre>
+
+<h3 id="Try-All-Permutations-no-pruning"><a href="#Try-All-Permutations-no-pruning" class="headerlink" title="Try All Permutations (no pruning)"></a>Try All Permutations (no pruning)</h3><p>Recall:</p>
+<ul>
+<li>a solution can be represented as a <strong>permutation</strong> of goals as input.</li>
+</ul>
+<p>Therefore it’s possible to loop over all permutations until a feasible solution is found. Generally, there is no pruning in this solution, which means there might be some unnecessary fails. But it depends on the implementation of <code>nextPermutaion</code> and can be combined with heuristics.</p>
+<pre><code class="highlight java"><span class="keyword">public</span> <span class="keyword">static</span> ArrayList&lt;Wire&gt; <span class="title function_">findPaths</span><span class="params">(Board board, ArrayList&lt;Endpoints&gt; goals)</span> &#123;
+    ArrayList&lt;Wire&gt; solutions = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(Collections.nCopies(goals.size(), <span class="literal">null</span>));
+    List&lt;Integer&gt; indices = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();
+    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; goals.size(); i++) &#123;
+        indices.add(i);
+    &#125;
+
+    <span class="keyword">do</span> &#123;
+        <span class="comment">// Before each permutation, ensure the board is clear of wires from previous attempts.</span>
+        clearWiresFromBoard(board, solutions);
+
+        <span class="type">boolean</span> <span class="variable">isValidPermutation</span> <span class="operator">=</span> <span class="literal">true</span>;
+        <span class="keyword">for</span> (<span class="type">int</span> index : indices) &#123;
+            <span class="type">Wire</span> <span class="variable">wire</span> <span class="operator">=</span> bfsFindPath(board, goals.get(index));
+            <span class="keyword">if</span> (wire != <span class="literal">null</span>) &#123;
+                board.placeWire(wire);
+                solutions.set(index, wire);
+            &#125; <span class="keyword">else</span> &#123;
+                <span class="comment">// If a wire couldn&#x27;t be placed, it&#x27;s necessary to remove all wires placed during this permutation attempt.</span>
+                <span class="keyword">for</span> (Wire w : solutions) &#123;
+                    <span class="keyword">if</span> (w != <span class="literal">null</span>) board.removeWire(w);
+                &#125;
+                <span class="comment">// Clear solutions to ensure a clean state for the next attempt.</span>
+                Collections.fill(solutions, <span class="literal">null</span>);
+                isValidPermutation = <span class="literal">false</span>;
+                <span class="keyword">break</span>;
+            &#125;
+        &#125;
+        <span class="keyword">if</span> (isValidPermutation) &#123;
+            <span class="keyword">return</span> solutions;  <span class="comment">// Found a valid configuration</span>
+        &#125;
+    &#125; <span class="keyword">while</span> (nextPermutation(indices));
+
+    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();  <span class="comment">// If all permutations fail, return an empty list</span>
+&#125;</code></pre>
+
+<h3 id="Unusual-Solution-Try-Catch-Exception-Handler"><a href="#Unusual-Solution-Try-Catch-Exception-Handler" class="headerlink" title="Unusual Solution: Try-Catch (Exception Handler)"></a>Unusual Solution: Try-Catch (Exception Handler)</h3><p>Here is a more “dynamic” and “on-the-fly” way to do backtracking and resolve conflicts:</p>
+<ul>
+<li>build path (“proposed path”) for each goal <em>independently</em>.</li>
+<li><code>try</code> to place them one by one.</li>
+<li><code>catch</code> the wire-wire conflict exception </li>
+<li>re-build a new path&#x2F;wire for the latter goal:<ul>
+<li>if succeed -&gt; move on to the next goal.</li>
+<li>if cannot re-build a new path -&gt; remove one previously placed wire on the board and retry.</li>
+</ul>
+</li>
+<li>until all conflicts solved.</li>
+</ul>
+<pre><code class="highlight java"><span class="keyword">public</span> <span class="keyword">static</span> ArrayList&lt;Wire&gt; <span class="title function_">findPaths</span><span class="params">(Board board, ArrayList&lt;Endpoints&gt; goals)</span> &#123;
+    ArrayList&lt;Wire&gt; finalWires = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();
+    HashMap&lt;Integer, Wire&gt; proposedPaths = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();
+
+    <span class="comment">// find a &quot;proposed path&quot; for each pair independently first</span>
+    <span class="comment">// notice that they might have conficts (wireWireException)!</span>
+    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; goals.size(); ++i) &#123;
+        <span class="type">Endpoints</span> <span class="variable">currgoal</span> <span class="operator">=</span> goals.get(i);
+        ArrayList&lt;Coord&gt; foundpath = bfs(board, currgoal.start, currgoal.end, currgoal.id);
+        <span class="type">Wire</span> <span class="variable">newWire</span> <span class="operator">=</span> <span class="literal">null</span>;
+        <span class="keyword">if</span> (foundpath != <span class="literal">null</span>) &#123;
+            newWire = <span class="keyword">new</span> <span class="title class_">Wire</span>(currgoal.id, foundpath);
+        &#125;
+        proposedPaths.put(currgoal.id, newWire);
+    &#125;
+
+    Queue&lt;Wire&gt; placedWires = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();
+    Queue&lt;Wire&gt; reAddWires = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();
+    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">1</span>; j &lt; goals.size()+<span class="number">1</span>; ++j) &#123;
+        <span class="type">Wire</span> <span class="variable">toAdd</span> <span class="operator">=</span> proposedPaths.get(goals.get(j-<span class="number">1</span>).id);
+        <span class="type">int</span> <span class="variable">okay</span> <span class="operator">=</span> <span class="number">0</span>;
+        <span class="keyword">while</span> (okay == <span class="number">0</span> || !reAddWires.isEmpty()) &#123;
+            <span class="keyword">try</span> &#123;
+                <span class="keyword">if</span>(!reAddWires.isEmpty())&#123;
+                    toAdd = reAddWires.remove();
+                    ArrayList&lt;Coord&gt; newpath = bfs(board,toAdd.start(),toAdd.end(),toAdd.id);
+                    toAdd = <span class="keyword">new</span> <span class="title class_">Wire</span>(toAdd.id,newpath);
+                    board.placeWire(toAdd);
+                    finalWires.add(toAdd);
+                    placedWires.add(toAdd);
+                    proposedPaths.put(toAdd.id, toAdd);
+                    okay = <span class="number">0</span>;
+                    <span class="keyword">if</span>(reAddWires.isEmpty())&#123;
+                        okay = <span class="number">1</span>;
+                    &#125;
+                &#125; <span class="keyword">else</span>&#123;
+                    toAdd = proposedPaths.get(goals.get(j-<span class="number">1</span>).id);
+                    <span class="keyword">if</span>(!finalWires.contains(toAdd))&#123;
+                        board.placeWire(toAdd);
+                        finalWires.add(toAdd);
+                        placedWires.add(toAdd);
+                        proposedPaths.put(toAdd.id, toAdd);
+                        okay = <span class="number">1</span>;
+                    &#125; <span class="keyword">else</span>&#123;
+                        okay = <span class="number">1</span>;
+                    &#125;
+                &#125;
+            &#125; <span class="keyword">catch</span> (Board.WireWireException e) &#123;
+                ArrayList&lt;Coord&gt; newpath = bfs(board,toAdd.start(),toAdd.end(),toAdd.id);
+                <span class="comment">// if newpath is null then we have to remove a previous wire to make this try to work</span>
+                <span class="keyword">while</span>(newpath == <span class="literal">null</span>)&#123;
+                    <span class="type">Wire</span> <span class="variable">removedtotry</span> <span class="operator">=</span> placedWires.remove();
+                    board.removeWire(removedtotry);
+                    reAddWires.add(removedtotry);
+                    placedWires.remove(removedtotry);
+                    finalWires.remove(removedtotry);
+                    newpath = bfs(board,toAdd.start(),toAdd.end(),toAdd.id);
+                &#125;
+                <span class="comment">// we finally found that one works.</span>
+                <span class="type">Wire</span> <span class="variable">newwiretoAdd</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Wire</span>(toAdd.id, newpath);
+                board.placeWire(newwiretoAdd);
+                finalWires.add(newwiretoAdd);
+                placedWires.add(newwiretoAdd);
+                proposedPaths.put(newwiretoAdd.id, newwiretoAdd);
+                okay = <span class="number">0</span>;
+            &#125;
+        &#125;
+    &#125;
+    <span class="keyword">return</span> finalWires;
+&#125;</code></pre></div></div></body><script src="/js/highlight.min.js"></script><script src="/js/main.js"></script><script src="/js/bootstrap/bootstrap.min.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXX"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XXXXXXXXX');</script></html>

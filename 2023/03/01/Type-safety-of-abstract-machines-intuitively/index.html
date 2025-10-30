@@ -1,0 +1,27 @@
+<!DOCTYPE html><html lang="en"><head><title>Type safety of abstract machines, intuitively</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><link rel="stylesheet" href="/css/highlight/xcode.min.css"><link rel="stylesheet" href="/css/bootstrap/bootstrap-tooltips.css"><link rel="stylesheet" href="/css/post.css"><script src="/js/jquery.min.js"></script><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><script>if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
+  document.body.classList.add('mobile')
+}</script><div><div class="inner"><h1>Type safety of abstract machines, intuitively</h1><div class="time">2023-03-01</div><div class="title-margin"></div><p>To prove type safety of a language, two lemmas - “preservation” and “progress” - are usually involved. They can be less intuitive to people who are not familiar with types. I would like to build a bridge between nanopass compiler framework and proof of type safety of abstract machines.</p>
+<h3 id="A-nanopass-compiler"><a href="#A-nanopass-compiler" class="headerlink" title="A nanopass compiler"></a>A nanopass compiler</h3><p><img src="/2023/03/01/Type-safety-of-abstract-machines-intuitively/nanopass.png"></p>
+<p>In the above picture, points <code>p₀</code> <code>p₁</code> <code>p₂</code> … <code>pₙ</code> are programs in the source language, IRs, and the target language (e.g. X86); arrows <code>t₁₂</code> <code>t₂₃</code> … <code>tₙ₋₁ₙ</code> are compiler passes that transform a program from <code>pₙ₋₁</code> to <code>pₙ</code>; arrows <code>eval₀</code> <code>eval₁</code> … <code>evalₙ</code> are evaluators of the source language, IRs, and the target language.</p>
+<p>In a desirable nanopass compiler, each pass should preserve the observable behaviors of the source program. So by <code>evalₓ</code> we can see each program, from source down to the target, is evaluated to have value <code>v</code>. These passes are what I call “value preserving transformations”.</p>
+<h3 id="Type-Safety-of-an-abstract-machine"><a href="#Type-Safety-of-an-abstract-machine" class="headerlink" title="Type Safety of an abstract machine"></a>Type Safety of an abstract machine</h3><p><img src="/2023/03/01/Type-safety-of-abstract-machines-intuitively/typing.png"></p>
+<p>Similarly, points <code>s₀</code> <code>s₁</code> … <code>sₙ</code> are machine states from a concrete computation; arrows <code>ra</code> <code>rb</code> … are state transition rules. Now think about the question: what are these vertical arrows mean?</p>
+<p>They are of type <code>State → Type</code>, so basically they represent typing of machine states. The proof of machine state typing can be hard and tedious, but luckily it’s off-topic. Now you have the big picture and the informal correspondence, let’s focus on what preservation and progress mean.</p>
+<ul>
+<li><strong>preservation</strong>: grab any two adjacent states <code>sₓ</code> and <code>sₓ₊₁</code>, and the arrow between them, say <code>rx</code>. If <code>sₓ ⊢ τ</code>, and <code>rx : sₓ ↦ sₓ₊₁</code>, we should have <code>sₓ₊₁ ⊢ τ</code> as well, i.e. <code>rx</code> preserves the type.</li>
+<li><strong>progress</strong>: grab any state <code>sₓ</code>, and its typing <code>sₓ ⊢ τ</code>, then we know <code>sₓ</code> is either the finial state, or there is another state <code>sₓ₊₁</code> where it can go along the transition <code>rx : sₓ ↦ sₓ₊₁</code>.</li>
+</ul>
+<p>By connecting preservation and progress, we can prove that all transition rules preserve typing.</p>
+<p>One significant difference here from the compiler example is, each transition rule can be used more than once during the computation while each compiler pass is unique along the whole compilation. These transition rules can also be called “type preserving transformations”.</p>
+<h3 id="Questions"><a href="#Questions" class="headerlink" title="Questions"></a>Questions</h3><ol>
+<li>Can you see the relation between the arrow <code>evalₓ</code> in the first picture and the whole computation <code>s₀ ↦* sₙ</code> in the second picture?</li>
+<li>Relation to Category Theory and commutative diagrams?</li>
+</ol>
+</div></div></body><script src="/js/highlight.min.js"></script><script src="/js/main.js"></script><script src="/js/bootstrap/bootstrap.min.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXX"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XXXXXXXXX');</script></html>

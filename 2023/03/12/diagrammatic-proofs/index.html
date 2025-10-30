@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="en"><head><title>A typical example of diagrammatic proofs</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><link rel="stylesheet" href="/css/highlight/xcode.min.css"><link rel="stylesheet" href="/css/bootstrap/bootstrap-tooltips.css"><link rel="stylesheet" href="/css/post.css"><script src="/js/jquery.min.js"></script><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><script>if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
+  document.body.classList.add('mobile')
+}</script><div><div class="inner"><h1>A typical example of diagrammatic proofs</h1><div class="time">2023-03-12</div><div class="title-margin"></div><p>Let’s assume we have four programs:</p>
+<pre><code class="highlight text">c₁ : B → C
+c₂ : A → D
+id : ∀ &#123;T&#125; T → T
+swap₊ : ∀ &#123;X Y&#125; X + Y → Y + X</code></pre>
+
+<p>And two ways to “compose” programs:</p>
+<pre><code class="highlight text">_⊕_ : (A → B) → (C → D) → (A + C → B + D)
+_⊙_ : (A → B) → (B → C) → (A → C)</code></pre>
+
+<p>We can now form four programs that are in some sense “equivalent”:</p>
+<pre><code class="highlight text">p₁ p₂ p₃ p₄ : (A + B) → (C + D)
+p₁ = (c₂ ⊕ c₁) ⊙ swap₊
+p₂ = swap₊ ⊙ (c₁ ⊕ c₂)
+p₃ = (id ⊕ c₁) ⊙ swap₊ ⊙ (id ⊕ c₂)
+p₄ = (c₂ ⊕ id) ⊙ swap₊ ⊙ (c₁ ⊕ id)</code></pre>
+
+<p>It means we can build bridges among these four “islands”:</p>
+<p><img src="/2023/03/12/diagrammatic-proofs/bridges.png"></p>
+<p>It’s much clearer if I draw four “wiring diagrams” representing <code>p₁</code> to <code>p₄</code>:</p>
+<p><img src="/2023/03/12/diagrammatic-proofs/p1-to-p4.png"></p>
+<p>Now I can tell you that 1 rule of diagrammatic reasoning is enough to prove these equivalences:</p>
+<blockquote>
+<p>Circuits can freely slide along wires.</p>
+</blockquote>
+<p>Imagining in you mind! </p>
+<h3 id="Formal-proofs-for-the-very-curious"><a href="#Formal-proofs-for-the-very-curious" class="headerlink" title="Formal proofs for the very curious"></a>Formal proofs for the very curious</h3><p>In order to prove that <code>p₁ p₂ p₃ p₄</code> are all equivalent “formally”, we need more than just 1 rule.</p>
+<p>First of all, we need a rule with which we can prove <code>p₁ ⇔ p₂</code> with zero effort:</p>
+<pre><code class="highlight text">swapr = (c₂ ⊕ c₁) ⊙ swap₊ ⇔ swap₊ ⊙ (c₁ ⊕ c₂)  -- it&#x27;s called &quot;double sliding&quot;</code></pre>
+
+<p>Then we need a rule for “doing nothing”. It’s like a identity program transformation or identity proof:</p>
+<pre><code class="highlight text">_ = c ⇔ c</code></pre>
+
+<p>We also need two rules <code>idl</code> and <code>idr</code>, to “append” and “prepend” the identity program:</p>
+<pre><code class="highlight text">idl = c ⇔ id ⊙ c
+idr = c ⇔ c ⊙ id</code></pre>
+
+<p>We need <code>re-organize</code> and <code>associativity</code> to perform “re-focusing” within proofs:</p>
+<pre><code class="highlight text">re-organize = (c₁ ⊙ c₂) ⊕ (c₃ ⊙ c₄) ⇔ (c₁ ⊕ c₃) ⊙ (c₂ ⊕ c₄)
+associativity = (c₁ ⊙ c₂) ⊙ c₃ ⇔ c₁ ⊙ (c₂ ⊙ c₃)</code></pre>
+
+<p>Besides, we need two compositional rules <code>_▣_</code> and <code>_□₊_</code> to compose proofs of “sub-programs”.</p>
+<pre><code class="highlight text">_▣_ : 
+    (c₁ ⇔ c₃) → (c₂ ⇔ c₄) →
+    ---------------------------
+    (c₁ ⊙ c₂) ⇔ (c₃ ⊙ c₄)
+          
+_□₊_ : 
+    (c₁ ⇔ c₃) → (c₂ ⇔ c₄) →
+    ---------------------------
+    (c₁ ⊕ c₂) ⇔ (c₃ ⊕ c₄)
+</code></pre>
+
+
+<p>The formal proof of <code>p₁ ⇔ p₃</code> is shown below:</p>
+<pre><code class="highlight text">p₁-p₃ : p₁ ⇔ p₃  -- it&#x27;s called single sliding
+  p₁-p₃ =
+    begin₂
+      (c₂ ⊕ c₁) ⊙ swap₊
+    ⇔⟨ (idl □₊ idr) ▣ _ ⟩
+      ((id ⊙ c₂) ⊕ (c ⊙ id₁)) ⊙ swap₊
+    ⇔⟨ re-organize ▣ _ ⟩
+      ((id ⊕ c₁) ⊙ (c₂ ⊕ id)) ⊙ swap₊
+    ⇔⟨ associativity ⟩
+      (id ⊕ c₁) ⊙ ((c₂ ⊕ id) ⊙ swap₊)
+    ⇔⟨ _ ▣ swapr ⟩
+      (id ⊕ c₁) ⊙ (swap₊ ⊙ (id ⊕ c₂))
+    end₂</code></pre>
+
+<p>The formal proof of <code>p₁ ⇔ p₃</code> can also be shown diagrammatically:</p>
+<p><img src="/2023/03/12/diagrammatic-proofs/step0.png"></p>
+<p>Step 0: preparation.</p>
+<p><img src="/2023/03/12/diagrammatic-proofs/step1.png"></p>
+<p>Step 1: apply <code>idl</code> and <code>idr</code> to <code>c₂</code> and <code>c₂</code> respectively with <code>_□₊_</code>, and leave <code>swap₊</code> alone (<code>_▣_</code> silently applied). </p>
+<p><img src="/2023/03/12/diagrammatic-proofs/step2.png"></p>
+<p>Step 2: <code>re-organize</code> the left part of the program, and leave <code>swap₊</code> alone (<code>_▣_</code> applied silently). </p>
+<p><img src="/2023/03/12/diagrammatic-proofs/step3.png"></p>
+<p>Step 3: apply <code>associativity</code> to the whole program.</p>
+<p><img src="/2023/03/12/diagrammatic-proofs/step4.png"></p>
+<p>Step 4: apply <code>swapr</code> to the right part of the program, and leave the left part alone (<code>_▣_</code> applied silently).</p>
+</div></div></body><script src="/js/highlight.min.js"></script><script src="/js/main.js"></script><script src="/js/bootstrap/bootstrap.min.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXX"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XXXXXXXXX');</script></html>

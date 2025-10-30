@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="en"><head><title>UIP as an incarnation of &quot;Being&quot;</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><link rel="stylesheet" href="/css/highlight/xcode.min.css"><link rel="stylesheet" href="/css/bootstrap/bootstrap-tooltips.css"><link rel="stylesheet" href="/css/post.css"><script src="/js/jquery.min.js"></script><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><script>if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
+  document.body.classList.add('mobile')
+}</script><div><div class="inner"><h1>UIP as an incarnation of &quot;Being&quot;</h1><div class="time">2023-03-01</div><div class="title-margin"></div><p>I would like to show how UIP can fit into the picture of “From Being To Becoming” in this article.</p>
+<h3 id="UIP-and-its-problem"><a href="#UIP-and-its-problem" class="headerlink" title="UIP and its problem"></a>UIP and its problem</h3><p>The uniqueness of identity proofs (UIP) principle basically says, if you have two proofs of identity, then these two proofs themselves are always considered equivalent.</p>
+<pre><code class="highlight text">A   ∈ Type ℓ
+a b ∈ A 
+p q ∈ a ≡ b
+-----------
+UIP ∈ p ≡ q</code></pre>
+
+<p>This can be problematic if <code>a</code> and <code>b</code> have some “structures” and you need to know the information about <em>how</em> <code>a</code> and <code>b</code> are made equivalent. Let’s see a simple example (and you may see this example from many HoTT papers and books) - when <code>a</code> and <code>b</code> are both <code>Bool</code>.</p>
+<p>Now imagine we have two proofs of <code>Bool ≡ Bool</code>, namely <code>p</code> and <code>q</code>. By intuition, can you see when <code>p</code> and <code>q</code> should not be considered equivalent? </p>
+<pre><code class="highlight text">p q ∈ Bool ≡ Bool</code></pre>
+
+<p>We have four functions in total of type <code>Bool → Bool</code>, and two of them - <code>id</code> and <code>not</code> - are “reversible”:</p>
+<pre><code class="highlight text">constT constF id not : Bool → Bool
+
+constT x = true
+
+constF x = false
+
+id true  = true
+id false = false
+
+not true  = false
+not false = true</code></pre>
+
+<p>Now suppose you don’t know anything specific in HoTT like univalence. The intuition here is: a proof of type <code>Bool ≡ Bool</code> is something like a “reversible program”, and since it’s a program, there has to be some <em>computational</em>, or <em>operational</em> content telling <em>how</em> <code>Bool</code> <strong>becomes</strong> equivalent to <code>Bool</code>. Therefore, <code>id</code> and <code>not</code> can be viewed as two distinct proofs of <code>Bool ≡ Bool</code> - and that’s something consistent with our “mental model” under most situations.</p>
+<p><img src="/2023/03/01/UIP-as-an-incarnation-of-Being/id-and-not.png"></p>
+<h3 id="UIP-as-“Being”"><a href="#UIP-as-“Being”" class="headerlink" title="UIP as “Being”"></a>UIP as “Being”</h3><p>The refutation of UIP has lead to 2DTT and HoTT. Now let me put UIP into the “From Being to Becoming” story. As you have already seen, by accepting UIP as a universal principle, you only get an “yes, it’s proved to be true” answer without any information about “evidence” - that is, the process of finding the truth. You only care about the destination, and forget everything in the journey. Whenever you see an equivalence like <code>X = Y</code>, you only notice “X <strong>is</strong> Y” and neglect “X <strong>becomes</strong> Y in some interesting way”.</p>
+<h3 id="Where-we-stop-asking-“How”"><a href="#Where-we-stop-asking-“How”" class="headerlink" title="Where we stop asking “How”"></a>Where we stop asking “How”</h3><p>By rejecting UIP, we take one step toward “Becoming”. But we should also notice that, even if we permit distinct identities between elements, like <code>id not ∈ Bool ≡ Bool</code> but <code>id ≠ not</code>, we don’t usually care about how two proofs of identities are equivalent. For example, there are usually more than one ways to prove <code>not ⊙ not ≡ id</code>:</p>
+<pre><code class="highlight text">way1 way2 ... ∈ not ⊙ not ≡ id</code></pre>
+
+<p>These “ways” can be different in some sense, but we don’t care. This is the case in <a target="_blank" rel="noopener" href="https://www.cs.cmu.edu/~drl/pubs/lh112tt/lh112tt.pdf">2DTT</a> and <a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2110.05404.pdf">Π-family</a> reversible programming languages. I would like to say, where we should stop asking “how” and just focus on “whether or not”, depends on some practical interests. Theoretically, if you keep asking “how”, you will push the “Becoming” worldview to the extreme, and get something called <a target="_blank" rel="noopener" href="https://ncatlab.org/nlab/show/infinity-groupoid">∞-groupoid</a>.</p>
+<p>I thank <a target="_blank" rel="noopener" href="https://cs.indiana.edu/contact/profile/index.html?Amr_Sabry">Prof. Amr Sabry</a> for insightful lectures on <a href="">Programming Language Foundations</a>.</p>
+</div></div></body><script src="/js/highlight.min.js"></script><script src="/js/main.js"></script><script src="/js/bootstrap/bootstrap.min.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXX"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XXXXXXXXX');</script></html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="en"><head><title>Coherence condition of two proofs in Cubical Agda?</title><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=0.5"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="manifest" href="/site.webmanifest"><link rel="stylesheet" href="/css/highlight/xcode.min.css"><link rel="stylesheet" href="/css/bootstrap/bootstrap-tooltips.css"><link rel="stylesheet" href="/css/post.css"><script src="/js/jquery.min.js"></script><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><script>if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
+  document.body.classList.add('mobile')
+}</script><div><div class="inner"><h1>Coherence condition of two proofs in Cubical Agda?</h1><div class="time">2023-03-01</div><div class="title-margin"></div><p>In Cubical Agda, there are multiple ways to prove a property of paths. For example, the most straightforward way to prove symmetricity is to use the primitive operator <code>~</code> on intervals:</p>
+<pre><code class="highlight text">≡-symm : ∀ &#123;ℓ&#125; &#123;A : Type ℓ&#125; &#123;a b : A&#125; → a ≡ b → b ≡ a
+≡-symm &#123;ℓ&#125;&#123;A&#125;&#123;a&#125;&#123;b&#125; p = λ i → p (~ i)</code></pre>
+
+<p>But there are at least two more ways to prove the same thing. One you may consider is to use <code>hcomp</code>, and set two egdes of a square (2-d cube) to <code>refl</code>:</p>
+<pre><code class="highlight agda">≡-symm₁ ≡-symm₂ ≡-symm₃ : ∀ &#123;ℓ&#125; &#123;A : Type ℓ&#125; &#123;a b : A&#125; 
+                        → a ≡ b → b ≡ a
+≡-symm₁ &#123;ℓ&#125;&#123;A&#125;&#123;a&#125;&#123;b&#125; p i = hcomp walls a
+  where
+    walls : ∀ j → Partial (∂ i) A
+    walls j (i = i0) = p j
+    walls j (i = i1) = a
+
+≡-symm₂ &#123;ℓ&#125;&#123;A&#125;&#123;a&#125;&#123;b&#125; p i = hcomp walls (p i)
+  where
+    walls : ∀ j → Partial (∂ i) A
+    walls j (i = i0) = p j
+    walls j (i = i1) = p (~ j)
+
+≡-symm₃ &#123;ℓ&#125;&#123;A&#125;&#123;a&#125;&#123;b&#125; p i = hcomp walls b
+  where
+    walls : ∀ j → Partial (∂ i) A
+    walls j (i = i0) = b
+    walls j (i = i1) = p (~ j)</code></pre>
+
+<p>You may also use <em>coercion</em>. The key is to construct a <em>type line</em> from <code>refl : a ≡ a</code> to something of type <code>b ≡ a</code>. Basically, you need to fix the right endpoint of a path, and let the left endpoint “slide” along some known path, and here it is <code>p : a ≡ b</code>:</p>
+<p><img src="/2023/03/01/Coherence-condition-of-two-proofs-in-Cubical-Agda/symm-coe.png"></p>
+<pre><code class="highlight text">coe0→1 : ∀ &#123;ℓ&#125; (A : I → Type ℓ) → A i0 → A i1
+coe0→1 A a = transp (λ i → A i) i0 a
+
+≡-symm : ∀ &#123;ℓ&#125; &#123;A : Type ℓ&#125; &#123;a b : A&#125; → a ≡ b → b ≡ a
+≡-symm &#123;ℓ&#125;&#123;A&#125;&#123;a&#125;&#123;b&#125; p = coe0→1 (λ i → p i ≡ a) refl</code></pre>
+
+<p>Now we have many syntactically different proofs of path symmetricity, can we ask what is the <em>coherence condition</em> of where these proofs are considered “equivalent”? What about other proofs like path transitivity?</p>
+<h3 id="Continued"><a href="#Continued" class="headerlink" title="(Continued)"></a>(Continued)</h3><p>So far we know that:</p>
+<ol>
+<li><p>The <a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1611.02108.pdf">CCHM</a> paper shows that <code>transp</code> can be expressed as a special case of <code>comp</code>. </p>
+<pre><code class="highlight text">Γ ⊢ (transpⁱ A a) = (compⁱ A [] a) : A(i1)</code></pre>
+</li>
+<li><p>The <a target="_blank" rel="noopener" href="http://www.cs.cmu.edu/~cangiuli/talks/defense.pdf">Cartesian Cubical Type Theory</a> shows <code>hcom</code> can be expressed by <code>coe</code>.</p>
+</li>
+<li><p>The <a target="_blank" rel="noopener" href="https://github.com/agda/cubical/blob/master/Cubical/Foundations/CartesianKanOps.agda">Cubical Agda</a> shows <code>coe</code> and be implemented with <code>transp</code>.</p>
+</li>
+</ol>
+<p>To do:</p>
+<ul>
+<li>Prove (1) and (2) in Cubical Agda.</li>
+</ul>
+</div></div></body><script src="/js/highlight.min.js"></script><script src="/js/main.js"></script><script src="/js/bootstrap/bootstrap.min.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXX"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XXXXXXXXX');</script></html>
