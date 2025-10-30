@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
-<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><script>if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.0"></head><body><script>if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
   document.body.classList.add('mobile')
 }</script><div><div class="inner"><h1>Transfinity, stream, and recursion</h1><div class="time">2023-08-02</div><div class="title-margin"></div><p>As you might see, this cannot be a worse title. But recently I was inspired by Zizek’s interpretation on Kant’s transcendental objects and Lacan’s <em>objet petit a</em>, in his book <em>Less Than Nothing</em>, to make these many things connected in a gradual sense.</p>
 <p>To begin with, one will assume a counting from zero. With ‘set representation’, one can write down:</p>
@@ -22,7 +22,7 @@
 <li>the constant possibility of adding one</li>
 <li>the impossibility to access the ultimate element <code>X</code></li>
 </ul>
-<p>What if there is a <strong>short-circuit</strong> between them? What if the impossible <code>X</code> itself is the constant possibility of adding one, represented as <code>&#123;...&#125;</code> (and any other representations with <code>...</code> inside like <code>&#123;0, 1, 2, ...&#125;</code>)?</p>
+<p>What if there is a <strong>short-circuit</strong> between them? What if the impossible <code>X</code> itself is the constant possibility of adding one, represented as <code>{...}</code> (and any other representations with <code>...</code> inside like <code>{0, 1, 2, ...}</code>)?</p>
 <p>With one more step forward, one can write this down carefully:</p>
 <pre><code class="highlight text">&#123;0, 1, 2, ..., &#123;0, 1, 2, ...&#125;&#125;</code></pre>
 
@@ -30,7 +30,7 @@
 <pre><code class="highlight text">&#123;0, 1, 2, ..., &#123;0, 1, 2, ..., X&#125;&#125;
 &#123;0, 1, 2, ..., &#123;0, 1, 2, ..., &#123;0, 1, 2, ...&#125;&#125;&#125;</code></pre>
 
-<p>The “constant possibility of adding one” is now inscribed into the level where the unfolding goes on. To make it more concise, if one takes <code>&#123;0, 1, 2, ..., X&#125;</code> as a totality of “constant possibility of adding one”, and <code>=</code> as the short-circuit operation:</p>
+<p>The “constant possibility of adding one” is now inscribed into the level where the unfolding goes on. To make it more concise, if one takes <code>{0, 1, 2, ..., X}</code> as a totality of “constant possibility of adding one”, and <code>=</code> as the short-circuit operation:</p>
 <pre><code class="highlight text">X = &#123;0, 1, 2, ..., X&#125;</code></pre>
 
 <p>It is the transfinity.</p>
@@ -70,7 +70,7 @@ g(x+1) = F(g(x))</code></pre>
 <li>Relation to co-induction?</li>
 </ul>
 <h3 id="More-foundational-symbolic-operations-toward-Lacan-and-beyond-Cantor"><a href="#More-foundational-symbolic-operations-toward-Lacan-and-beyond-Cantor" class="headerlink" title="More foundational symbolic operations: toward Lacan, and beyond Cantor"></a>More foundational symbolic operations: toward Lacan, and beyond Cantor</h3><p><strong>Gaze</strong> and <strong>Silence</strong> are two symbolic mechanisms familiar to continental schools. To show them properly, I have to refer to Lacanian theory (the Big Other and the objet petit a). There are two ways to illustrate them, one in set-theoretical style, another in categorical way (you can have Yoneda at hands).</p>
-<p>Suppose we have a (finite) collection&#x2F;set, say <code>&#123;0, 1, 2, 3&#125;</code>. The critical idea here is: identity is not free - i.e. one cannot justify <code>0</code>‘s identity <code>0 = 0</code> simply by its own <strong>presence</strong>. Instead, it’s very identity should be obtained through it’s <strong>absence</strong> and <strong>difference</strong> from <em>other</em> elements - i.e. one can say <code>0 = &#123;1, 2, 3&#125;</code>, <code>1 = &#123;0, 2, 3&#125;</code>…</p>
+<p>Suppose we have a (finite) collection&#x2F;set, say <code>{0, 1, 2, 3}</code>. The critical idea here is: identity is not free - i.e. one cannot justify <code>0</code>‘s identity <code>0 = 0</code> simply by its own <strong>presence</strong>. Instead, it’s very identity should be obtained through it’s <strong>absence</strong> and <strong>difference</strong> from <em>other</em> elements - i.e. one can say <code>0 = {1, 2, 3}</code>, <code>1 = {0, 2, 3}</code>…</p>
 <p>Note the italic <em>other</em> here. The <strong>Otherness</strong> seems to be more explicit and tangible in category theory. But let me first introduce the Big Other under set theory - <code>A</code> is defined as:</p>
 <pre><code class="highlight text">A = &#123;0, 1, 2, 3, A&#125;</code></pre>
 
@@ -82,8 +82,8 @@ g(x+1) = F(g(x))</code></pre>
 <pre><code class="highlight text">a = &#123;a, A&#125;</code></pre>
 
 <p>It says: <code>A</code> has its own master, which is <code>a</code>. Just like <code>A</code> can repeatedly unfold itself, so does <code>a</code> here. As a result, <code>A</code> is as common as the usual others. But is this true? Unfolding of <code>a</code> only generates a dull sequence of <code>A</code> which is suspicious enough. </p>
-<p>Here the proper catch is: where does this mysterious <code>a</code> come from? Is it really something behind <code>A</code>? The answer is: from the commonplace elements - i.e. one element from <code>&#123;0, 1, 2, 3&#125;</code> is “sacrificed” to play the role as seemingly transcendental <code>a</code>. One should recall Hegel’s famous line “essence is the appearance <em>qua</em> appearance”, here the essence is the illusionary signal that there is an <code>a</code> beyond <code>A</code>.</p>
-<p>To sum up, <strong>Gaze</strong> is the <code>=</code> operation in <code>0 = &#123;1, 2, 3&#125;</code>, <code>1 = &#123;0, 1, 2&#125;</code>…(Probably a good question to think about: what is the gaze from the Big Other?)</p>
+<p>Here the proper catch is: where does this mysterious <code>a</code> come from? Is it really something behind <code>A</code>? The answer is: from the commonplace elements - i.e. one element from <code>{0, 1, 2, 3}</code> is “sacrificed” to play the role as seemingly transcendental <code>a</code>. One should recall Hegel’s famous line “essence is the appearance <em>qua</em> appearance”, here the essence is the illusionary signal that there is an <code>a</code> beyond <code>A</code>.</p>
+<p>To sum up, <strong>Gaze</strong> is the <code>=</code> operation in <code>0 = {1, 2, 3}</code>, <code>1 = {0, 1, 2}</code>…(Probably a good question to think about: what is the gaze from the Big Other?)</p>
 <p>In category theory, the Yoneda Embedding shows <em>the gaze proper</em>:</p>
 <pre><code class="highlight text">X ↦ Hom(_,X)</code></pre>
 
@@ -93,7 +93,7 @@ g(x+1) = F(g(x))</code></pre>
 <li>How to locate the Big Other in a category?</li>
 <li>How about the objet petit a?</li>
 </ul>
-</div></div></body><script src="/js/highlight.min.js"></script><script src="/js/main.js"></script><script src="/js/bootstrap/bootstrap.min.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXX"></script><script>window.dataLayer = window.dataLayer || [];
+<p class="textAlignRight"><span>↶ </span><a href="/">Home</a><span></span></p></div></div></body><script src="/js/highlight.min.js"></script><script src="/js/main.js"></script><script src="/js/bootstrap/bootstrap.min.js"></script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXX"></script><script>window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-XXXXXXXXX');</script></html>
